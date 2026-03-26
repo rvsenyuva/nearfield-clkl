@@ -1,0 +1,16 @@
+# MATLAB generated files
+*.asv
+*.autosave
+*.m~
+slprj/
+
+# Simulation output (figures & data — too large for GitHub)
+*.pdf
+*.fig
+*.mat
+nf_simulation_results.csv
+nf_ablation_results.csv
+
+# OS files
+.DS_Store
+Thumbs.db
