@@ -28,7 +28,7 @@ function lh = nf_add_legend(fig, methods, styles, colors, varargin)
 p = inputParser();
 p.addParameter('FontSize',   8,  @isnumeric);
 p.addParameter('filled_idx', [], @isnumeric);
-p.addParameter('NumColumns', 0,  @isnumeric);  % 0 = auto (all in one row)
+p.addParameter('NumColumns', 0,  @isnumeric);  % 0=auto (all in one row)
 p.parse(varargin{:});
 opt = p.Results;
 
@@ -86,13 +86,13 @@ for mi = 1:n_meth
 end
 
 % ── Step 3: create and position the legend ────────────────────────────────
-n_cols_use = opt.NumColumns;
-if n_cols_use <= 0
-    n_cols_use = n_meth;  % default: all in one row
+n_cols_leg = opt.NumColumns;
+if n_cols_leg <= 0
+    n_cols_leg = numel(methods);  % all in one row (default)
 end
 lh = legend(ax_leg, dum, methods, ...
     'Orientation', 'horizontal', ...
-    'NumColumns',  n_cols_use, ...
+    'NumColumns',  n_cols_leg, ...
     'FontSize',    opt.FontSize, ...
     'Box',         'on');
 
@@ -102,6 +102,10 @@ lh.Units = 'normalized';
 leg_w    = lh.Position(3);
 leg_h    = lh.Position(4);
 
-% Centre horizontally; sit near the bottom of the reserved strip.
-lh.Position = [(1 - leg_w) / 2,  0.01,  leg_w,  leg_h];
+% Centre horizontally; clamp so legend never clips either edge.
+x_left = max(0.01, (1 - leg_w) / 2);
+if x_left + leg_w > 0.99
+    x_left = max(0.01, 0.99 - leg_w);
+end
+lh.Position = [x_left,  0.01,  leg_w,  leg_h];
 end

@@ -12,10 +12,10 @@ P.M    = 64;  P = nf_update_derived_pub(P);
 P.N_RF = 8;   P.N = 64;   P.d = 3;
 P.N_MC = 400; if fast; P.N_MC = 20; end
 
-% Explicit 9-point sweep matching Fig.2 (override P.SNR_dB_vec)
+% Explicit 9-point sweep matching Fig.2
 SNR_vec = [-15, -10:5:20, 25];
 n_snr   = numel(SNR_vec);
-methods = {'CL-KL (Fresnel est.)','P-SOMP (Fresnel est.)','DL-OMP (Fresnel est.)','DFrFT-NOMP (Fresnel est.)','BF-SOMP (Fresnel est.)'};
+methods = {'CL-KL','P-SOMP','DL-OMP','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
 assert(n_meth==5,'expected 5 methods');
 NMSE_db = nan(n_meth,n_snr);  NMSE_std = nan(n_meth,n_snr);
@@ -70,7 +70,7 @@ plot_fig(SNR_vec, NMSE_db, NMSE_std, methods, ...
     'SNR (dB)', 'Fig7_Robustness', ...
     'NumColumns', 2, 'LegTitle', '');
 xlim([min(SNR_vec)-1, max(SNR_vec)+1]);
-% Single-column export (placed side-by-side with Fig.8 in LaTeX)
+% Single-column export (side-by-side with Fig.8 in LaTeX)
 nf_export_fig(gcf, 'fig7_robustness', 'single', 'Height', 8.0);
 fprintf('Fig.7 -> fig7_robustness.pdf  |  CSV -> %s\n', CSV);
 end

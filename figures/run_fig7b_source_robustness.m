@@ -40,7 +40,8 @@ P.M   = 64;  P = nf_update_derived_pub(P);
 P.N_RF = 8;  P.N = 64;  P.d = 3;
 P.N_MC = 400; if fast; P.N_MC = 20; end
 
-SNR_vec = [-15, -10:5:20, 25];   % extended: -15 and +25 added
+% Explicit 9-point sweep matching Fig.2
+SNR_vec = [-15, -10:5:20, 25];
 n_snr   = numel(SNR_vec);
 
 methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
@@ -114,7 +115,7 @@ colors6  = {[0 0.45 0.74],[0.85 0.33 0.10],[0.47 0.67 0.19], ...
             [0.49 0.18 0.56],[0.93 0.69 0.13],[0.30 0.57 0.43]};
 compressed_idx = [1, 2];
 
-fig7b = figure('Name','Fig7b_SourceRobust','Position',[100 100 1050 420]);
+fig7b = figure('Name','Fig7b_SourceRobust','Position',[100 100 1050 520]);
 
 % --- Left panel: absolute NMSE for both pilot types ----------------------
 subplot(1,2,1);
@@ -147,14 +148,14 @@ ylabel('NMSE gap [dB] (QPSK - Gauss)','FontSize',12);
 title({'Source model robustness gap','positive = QPSK worse'},'FontSize',12);
 grid on; ylim([-3 3]);
 
-sgtitle('Fig.7b: Source Model Robustness -- Gaussian vs QPSK Pilots','FontSize',13);
+sgtitle(sprintf('Fig.7b: Source Model Robustness -- Gaussian vs QPSK Pilots\n\n'), 'FontSize', 12);
 
 % Unified single legend centred below both panels (methods only; QPSK
 % curves are dashed same-colour and explained in title/caption).
 nf_add_legend(fig7b, methods, styles6, colors6, ...
     'FontSize', 8, 'filled_idx', compressed_idx);
 % Height 8.5 cm (+1.5 cm vs original 7.0)
-nf_export_fig(gcf, 'fig7b_source_robustness', 'double', 'Height', 8.5);
+nf_export_fig(gcf, 'fig7b_source_robustness', 'double', 'Height', 9.5);
 fprintf('Fig.7b -> fig7b_source_robustness.pdf  |  CSV -> %s\n', CSV);
 end
 

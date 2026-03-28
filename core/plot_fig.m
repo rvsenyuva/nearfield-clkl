@@ -1,15 +1,19 @@
 function plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name, varargin)
 %PLOT_FIG  Standard errorbar plot used by Figs 2, 3, 4, 7.
-%
-%  plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name)
-%  plot_fig(..., 'NumColumns', 2)     % override legend columns
-%  plot_fig(..., 'LegTitle', '')      % suppress legend title
-
+%  Optional name-value pairs:
+%    'NumColumns'  - legend columns (default 3)
+%    'LegTitle'    - legend title string (default standard; '' to suppress)
 p = inputParser();
 p.addParameter('NumColumns', 3,       @isnumeric);
 p.addParameter('LegTitle',   'Filled: compressed | Open: full-array', @ischar);
 p.parse(varargin{:});
 opt = p.Results;
+%
+%  plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name)
+%
+%  CHANGE (legend fix): legend placed below axes ('southoutside', horizontal,
+%  3 columns) so it never obstructs plotted curves.  Callers must increase
+%  the nf_export_fig Height by ~2 cm to accommodate the extra legend strip.
 
 n_meth = numel(methods);
 % Method order: CL-KL, P-SOMP, DL-OMP, MUSIC+Tri, DFrFT-NOMP, BF-SOMP

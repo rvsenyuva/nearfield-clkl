@@ -10,10 +10,10 @@ CSV = 'nf_simulation_results.csv';
 P      = nf_params();
 P.M    = 64;  P = nf_update_derived_pub(P);
 P.N    = 64;  P.d = 3;
-P.N_MC = 200; if fast; P.N_MC = 20; end
+P.N_MC = 400; if fast; P.N_MC = 20; end
 SNR_fix = 10;
 
-NRF_vec = [4, 8, 16];
+NRF_vec = [4, 8, 12, 16];
 n_nrf   = numel(NRF_vec);
 methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);

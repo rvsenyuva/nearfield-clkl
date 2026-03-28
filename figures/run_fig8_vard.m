@@ -153,11 +153,11 @@ xlabel('Number of paths d','FontSize',12);
 ylabel('NMSE (dB)','FontSize',12);
 title('Fig.8: Channel NMSE vs Number of Paths d','FontSize',13);
 grid on; set(gca,'XTick',d_vec,'FontSize',11);
-% Legend southoutside; 7 entries in 3 columns (fits single-column width)
+% 3 cols fits single-column width without clipping
 leg8 = legend('Orientation','horizontal','NumColumns',3, ...
               'Location','southoutside','FontSize',8);
-leg8.Title.String = ''; % no title — saves width
-% Single-column export (placed side-by-side with Fig.7 in LaTeX)
+leg8.Title.String = '';
+% Single-column export (side-by-side with Fig.7)
 nf_export_fig(fig8, 'fig8_vard', 'single', 'Height', 8.0);
 
 % --- Fig.8b: RMSE vs d with CRB (two subplots, unified legend) -------
@@ -190,7 +190,7 @@ styles8b  = [styles7, {'--'}];
 colors8b  = [colors7, {[0 0 0]}];
 nf_add_legend(fig8b, methods8b, styles8b, colors8b, ...
     'FontSize', 8, 'filled_idx', [1 2], 'NumColumns', 4);
-% Height 9.5 cm: +1 cm vs previous for 2-row legend
+% Height 9.5 cm for 2-row legend
 nf_export_fig(fig8b, 'fig8b_vard_rmse', 'double', 'Height', 9.5);
 
 fprintf('Fig.8  -> fig8_vard.pdf\n');
