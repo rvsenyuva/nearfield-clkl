@@ -25,11 +25,11 @@ reduction in data volume versus full-array methods.
 
 ## Requirements
 
-- MATLAB R2023b or later
+- MATLAB R2023b or later (tested: R2025b)
 - Parallel Computing Toolbox (optional; required only for `parfor` mode)
 - No additional toolboxes required
 
-Tested on: Windows 11, AMD Ryzen 5 7500F (6-core), MATLAB R2023b.
+Tested on: Windows 11, AMD Ryzen 5 7500F (6-core), MATLAB R2025b (R2023b compatible).
 
 ---
 

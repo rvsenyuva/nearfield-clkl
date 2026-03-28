@@ -10,10 +10,10 @@ CSV = 'nf_simulation_results.csv';
 P      = nf_params();
 P.M    = 64;  P = nf_update_derived_pub(P);
 P.N    = 64;  P.d = 3;
-P.N_MC = 400; if fast; P.N_MC = 20; end
+P.N_MC = 200; if fast; P.N_MC = 20; end
 SNR_fix = 10;
 
-NRF_vec = [4, 8, 12, 16];   % N_RF=12 added to clarify scaling between 8 and 16
+NRF_vec = [4, 8, 16];
 n_nrf   = numel(NRF_vec);
 methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
@@ -64,12 +64,11 @@ end
 
 
 plot_fig(NRF_vec, NMSE_db, NMSE_std, methods, ...
-    'Fig.3: NMSE vs N_{RF} (Hybrid Compression)', 'N_{RF}', 'Fig3_NMSE_vs_NRF');
+    'Fig.3: NMSE vs N_{RF} (Hybrid Compression)', 'N_{RF}', 'Fig3_NMSE_vs_NRF', ...
+    'NumColumns', 2, 'LegTitle', '');
 set(gca,'XTick',NRF_vec); xlim([3 17]);
-% Single-column layout (8.8 cm wide) at 7.0 cm height -- correct for
-% half-column minipage rendering in LaTeX (aspect ratio ~0.80).
-% Previously 'double'/9.5 cm gave a nearly-square aspect ratio.
-nf_export_fig(gcf, 'fig3_nmse_nrf', 'single', 'Height', 7.0);
+% Single-column export (placed side-by-side with Fig.4 in LaTeX)
+nf_export_fig(gcf, 'fig3_nmse_nrf', 'single', 'Height', 8.5);
 fprintf('Fig.3 -> fig3_nmse_nrf.pdf  |  CSV -> %s\n', CSV);
 end
 

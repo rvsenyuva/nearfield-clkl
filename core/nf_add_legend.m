@@ -2,46 +2,46 @@ function lh = nf_add_legend(fig, methods, styles, colors, varargin)
 %NF_ADD_LEGEND  Place a single unified horizontal legend below all subplots.
 %
 %  lh = nf_add_legend(fig, methods, styles, colors)
-%  lh = nf_add_legend(fig, methods, styles, colors, Name, Value, ...)
+%  lh = nf_add_legend(fig, methods, styles, colors, 'FontSize', 8)
 %
-%  Compresses all data axes into a reserved interior region of the figure,
-%  leaving BOTTOM_RESERVE at the bottom for the legend strip and TOP_RESERVE
-%  at the top for the sgtitle, then places a single horizontal legend
-%  centred at the bottom.
+%  Compresses all data axes upward by BOTTOM_RESERVE (15% of figure height)
+%  to create unobstructed space below the x-axis tick labels, then places
+%  a single horizontal legend centred in that reserved strip.
 %
-%  OPTIONAL NAME-VALUE PARAMETERS
-%  -------------------------------
-%  'FontSize'      : legend font size in pt        (default 8)
-%  'filled_idx'    : indices of compressed-domain (filled-marker) methods
-%  'NumColumns'    : number of legend columns       (default = numel(methods),
-%                    i.e., single row; set to 4 for 8-entry 2-row legend)
-%  'TopReserve'    : fraction of figure height kept free above subplots
-%                    for sgtitle clearance           (default 0.05)
+%  The ghost axes used for the legend is tagged 'legend_dummy' so that
+%  nf_export_fig skips it during font/linewidth formatting.
+%
+%  INPUTS
+%  ------
+%  fig     : figure handle
+%  methods : cell array of method name strings
+%  styles  : cell array of plot style strings
+%  colors  : cell array of [R G B] colour vectors
+%
+%  OPTIONAL NAME-VALUE
+%  -------------------
+%  'FontSize'   : legend font size in pt  (default 8)
+%  'filled_idx' : indices of compressed-domain (filled-marker) methods
 %
 %  See also: nf_export_fig, plot_fig
 
 p = inputParser();
-p.addParameter('FontSize',    8,   @isnumeric);
-p.addParameter('filled_idx',  [],  @isnumeric);
-p.addParameter('NumColumns',  [],  @isnumeric);   % [] → all in one row
-p.addParameter('TopReserve',  0.05, @isnumeric);  % space above subplots
+p.addParameter('FontSize',   8,  @isnumeric);
+p.addParameter('filled_idx', [], @isnumeric);
+p.addParameter('NumColumns', 0,  @isnumeric);  % 0 = auto (all in one row)
 p.parse(varargin{:});
 opt = p.Results;
 
 n_meth = numel(methods);
-if isempty(opt.NumColumns)
-    num_cols = n_meth;   % single-row default
-else
-    num_cols = opt.NumColumns;
-end
 
-% ── Step 1: compress data axes into the interior reserved region ──────────
-% Bottom reserve: legend strip + x-axis tick label overhang.
-% Top reserve:    sgtitle clearance (larger when subplot titles are multi-line).
+% ── Step 1: compress data axes upward to reserve bottom strip ────────────
+% Maps each axis from figure-normalised [0,1] space into the top
+% (1-BOTTOM_RESERVE) fraction, leaving BOTTOM_RESERVE free at the bottom
+% for the legend strip and the downward-extending x-axis tick labels.
+% Axes with height < 0.05 are skipped (sgtitle / annotation axes).
 BOTTOM_RESERVE = 0.15;
-TOP_RESERVE    = opt.TopReserve;
 
-drawnow;
+drawnow;   % flush renderer so Position values are current
 
 all_ax = findall(fig, 'Type', 'axes');
 for ax = all_ax'
@@ -54,14 +54,13 @@ for ax = all_ax'
     if pos(4) < 0.05
         continue   % skip sgtitle / annotation axes
     end
-    % Available interior height: from BOTTOM_RESERVE to (1 - TOP_RESERVE)
-    interior_h = 1 - BOTTOM_RESERVE - TOP_RESERVE;
-    new_bottom = pos(2) * interior_h + BOTTOM_RESERVE;
-    new_height = pos(4) * interior_h;
+    % Remap bottom from [0,1] into [BOTTOM_RESERVE, 1]
+    new_bottom = pos(2) * (1 - BOTTOM_RESERVE) + BOTTOM_RESERVE;
+    new_height = pos(4) * (1 - BOTTOM_RESERVE);
     ax.Position = [pos(1), new_bottom, pos(3), new_height];
 end
 
-% ── Step 2: ghost axes at y=0 hosting dummy lines for the legend ─────────
+% ── Step 2: ghost axes at y=0 (invisible; hosts dummy lines for legend) ──
 ax_leg = axes(fig, ...
     'Position',          [0, 0, 1, 0.001], ...
     'Visible',           'off', ...
@@ -74,9 +73,9 @@ for mi = 1:n_meth
     col = colors{mi};
     sty = styles{mi};
     if ~isempty(opt.filled_idx) && ismember(mi, opt.filled_idx)
-        mfc = col;
+        mfc = col;    % filled = compressed domain
     else
-        mfc = 'none';
+        mfc = 'none'; % open   = full-array
     end
     dum(mi) = plot(ax_leg, NaN, NaN, sty, ...
         'Color',           col, ...
@@ -87,16 +86,22 @@ for mi = 1:n_meth
 end
 
 % ── Step 3: create and position the legend ────────────────────────────────
+n_cols_use = opt.NumColumns;
+if n_cols_use <= 0
+    n_cols_use = n_meth;  % default: all in one row
+end
 lh = legend(ax_leg, dum, methods, ...
     'Orientation', 'horizontal', ...
-    'NumColumns',  num_cols, ...
+    'NumColumns',  n_cols_use, ...
     'FontSize',    opt.FontSize, ...
     'Box',         'on');
 
-drawnow;
+drawnow;   % flush so lh.Position reflects actual rendered legend size
 
 lh.Units = 'normalized';
 leg_w    = lh.Position(3);
 leg_h    = lh.Position(4);
+
+% Centre horizontally; sit near the bottom of the reserved strip.
 lh.Position = [(1 - leg_w) / 2,  0.01,  leg_w,  leg_h];
 end

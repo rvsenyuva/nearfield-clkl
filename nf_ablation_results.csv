@@ -1,0 +1,13 @@
+timestamp,config_name,ablation_flags,SNR_dB,NMSE_dB_mean,RMSE_theta_deg_mean,RMSE_r_m_mean,fail_rate_pct,N_MC
+2026-03-28 12:44:24,CL-KL (full),none (full CL-KL),-5,2.1144,10.6184,15.4937,96.00,50
+2026-03-28 12:44:24,CL-KL (full),none (full CL-KL),5,-2.8664,8.4610,16.4602,98.00,50
+2026-03-28 12:44:24,CL-KL (full),none (full CL-KL),15,-3.5431,8.1343,17.2598,98.00,50
+2026-03-28 12:44:24,w/o frozen N0,update_N0,-5,2.1432,10.3465,15.7398,96.00,50
+2026-03-28 12:44:24,w/o frozen N0,update_N0,5,-2.9692,8.2926,16.4765,98.00,50
+2026-03-28 12:44:24,w/o frozen N0,update_N0,15,-4.5409,7.8160,16.0398,98.00,50
+2026-03-28 12:44:24,w/o multi-start,single_start,-5,2.1702,10.5630,18.8007,98.00,50
+2026-03-28 12:44:24,w/o multi-start,single_start,5,-3.0910,8.6043,18.0817,98.00,50
+2026-03-28 12:44:24,w/o multi-start,single_start,15,-3.6696,8.8884,18.0548,98.00,50
+2026-03-28 12:44:24,w/o post-loop scan,skip_scan,-5,3.3312,7.5888,25.0914,100.00,50
+2026-03-28 12:44:24,w/o post-loop scan,skip_scan,5,-3.3651,4.1260,26.6946,100.00,50
+2026-03-28 12:44:24,w/o post-loop scan,skip_scan,15,-2.2059,8.2878,28.6215,100.00,50

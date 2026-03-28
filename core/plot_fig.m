@@ -1,11 +1,15 @@
-function plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name)
+function plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name, varargin)
 %PLOT_FIG  Standard errorbar plot used by Figs 2, 3, 4, 7.
 %
 %  plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_name)
-%
-%  CHANGE (legend fix): legend placed below axes ('southoutside', horizontal,
-%  3 columns) so it never obstructs plotted curves.  Callers must increase
-%  the nf_export_fig Height by ~2 cm to accommodate the extra legend strip.
+%  plot_fig(..., 'NumColumns', 2)     % override legend columns
+%  plot_fig(..., 'LegTitle', '')      % suppress legend title
+
+p = inputParser();
+p.addParameter('NumColumns', 3,       @isnumeric);
+p.addParameter('LegTitle',   'Filled: compressed | Open: full-array', @ischar);
+p.parse(varargin{:});
+opt = p.Results;
 
 n_meth = numel(methods);
 % Method order: CL-KL, P-SOMP, DL-OMP, MUSIC+Tri, DFrFT-NOMP, BF-SOMP
@@ -39,11 +43,12 @@ grid on;
 set(gca, 'FontSize', 11);
 
 % Legend below axes -- no curve obstruction.
-% NumColumns=3 keeps the strip compact (2 rows of 3 for 6 methods).
 leg = legend('Orientation', 'horizontal', ...
-             'NumColumns',  3, ...
+             'NumColumns',  opt.NumColumns, ...
              'Location',    'southoutside', ...
              'FontSize',    9);
-leg.Title.String    = 'Filled: compressed | Open: full-array';
-leg.Title.FontSize  = 8;
+if ~isempty(opt.LegTitle)
+    leg.Title.String   = opt.LegTitle;
+    leg.Title.FontSize = 8;
+end
 end

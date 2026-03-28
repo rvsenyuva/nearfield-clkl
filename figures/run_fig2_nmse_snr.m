@@ -12,7 +12,9 @@ P.M    = 64;   P = nf_update_derived_pub(P);
 P.N_RF = 8;    P.N = 64;    P.d = 3;
 P.N_MC = 400;  if fast; P.N_MC = 20; end
 
-SNR_vec = [-15, -10:5:20, 25];   % extended: -15 and +25 added
+% Explicit 9-point sweep: [-15,-10,-5,0,+5,+10,+15,+20,+25] dB
+% (override P.SNR_dB_vec to ensure -15 and +25 are included)
+SNR_vec = [-15, -10:5:20, 25];
 n_snr   = numel(SNR_vec);
 methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
@@ -85,6 +87,24 @@ end
 
 plot_fig(SNR_vec, NMSE_db, NMSE_std, methods, ...
     'Fig.2: Channel NMSE vs SNR', 'SNR (dB)', 'Fig2_NMSE_vs_SNR');
+
+% --- R1: Annotate CL-KL +25 dB OMP warm-start limitation ---
+% Find the +25 dB point index
+idx25 = find(SNR_vec == 25, 1);
+if ~isempty(idx25)
+    ax = gca;
+    hold(ax, 'on');
+    % Plot hollow circle marker on the CL-KL curve at +25 dB
+    plot(ax, SNR_vec(idx25), NMSE_db(1,idx25), 'ko', ...
+        'MarkerSize', 10, 'LineWidth', 1.5, ...
+        'MarkerFaceColor', 'none', 'HandleVisibility', 'off');
+    % Text annotation: use latex interpreter so \dagger renders correctly
+    text(ax, SNR_vec(idx25) - 1.2, NMSE_db(1,idx25) + 2.0, ...
+        '$\dagger\dagger$ OMP limitation', ...
+        'FontSize', 7, 'HorizontalAlignment', 'right', ...
+        'Interpreter', 'latex');
+end
+
 % Height 9.5 cm: +2 cm vs original 7.5 to accommodate below-axes legend
 nf_export_fig(gcf, 'fig2_nmse_snr', 'double', 'Height', 9.5);
 

@@ -12,7 +12,8 @@ P.M    = 64;  P = nf_update_derived_pub(P);
 P.N_RF = 8;   P.N = 64;   P.d = 3;
 P.N_MC = 400; if fast; P.N_MC = 20; end
 
-SNR_vec = [-15, -10:5:20, 25];   % extended: -15 and +25 added
+% Explicit 9-point sweep matching Fig.2 (override P.SNR_dB_vec)
+SNR_vec = [-15, -10:5:20, 25];
 n_snr   = numel(SNR_vec);
 methods = {'CL-KL (Fresnel est.)','P-SOMP (Fresnel est.)','DL-OMP (Fresnel est.)','DFrFT-NOMP (Fresnel est.)','BF-SOMP (Fresnel est.)'};
 n_meth  = numel(methods);
@@ -66,10 +67,11 @@ end
 plot_fig(SNR_vec, NMSE_db, NMSE_std, methods, ...
     {'Fig.7: Robustness -- Exact USW Data, Fresnel Estimators'; ...
      '(deliberate truth-model mismatch)'}, ...
-    'SNR (dB)', 'Fig7_Robustness');
+    'SNR (dB)', 'Fig7_Robustness', ...
+    'NumColumns', 2, 'LegTitle', '');
 xlim([min(SNR_vec)-1, max(SNR_vec)+1]);
-% Height 9.5 cm (+2 cm) for below-axes legend from plot_fig
-nf_export_fig(gcf, 'fig7_robustness', 'double', 'Height', 9.5);
+% Single-column export (placed side-by-side with Fig.8 in LaTeX)
+nf_export_fig(gcf, 'fig7_robustness', 'single', 'Height', 8.0);
 fprintf('Fig.7 -> fig7_robustness.pdf  |  CSV -> %s\n', CSV);
 end
 
