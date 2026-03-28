@@ -4,6 +4,7 @@ function run_fig4_nmse_n(fast, use_par)
 %  Results written to nf_simulation_results.csv after each N point.
 if nargin < 1; fast = false; end
 if nargin < 2; use_par = false; end
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 CSV = 'nf_simulation_results.csv';
 

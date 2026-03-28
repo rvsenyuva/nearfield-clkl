@@ -22,6 +22,7 @@ function run_ablation(use_par)
 %  are unaffected.
 
 if nargin < 1; use_par = false; end
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 % ---- Setup ----------------------------------------------------------
 this_dir = fileparts(mfilename('fullpath'));

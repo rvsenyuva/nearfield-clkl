@@ -23,6 +23,7 @@ function run_fig5_nearfar(fast, use_par)
 %  Results written to nf_simulation_results.csv after each sweep point.
 if nargin < 1; fast = false; end
 if nargin < 2; use_par = false; end
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 CSV = 'nf_simulation_results.csv';
 
@@ -36,9 +37,9 @@ SNR_fix = 10;
 rmax_fac_vec = [0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 3.0, 5.0];
 r_lo_fac_fix = P.r_lo_fac;   % 0.05 -- fixed across all sweep points
 n_r    = numel(rmax_fac_vec);
-methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
+methods = {'CL-KL','P-SOMP','DL-OMP','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
-assert(n_meth==6,'expected 6 methods');
+assert(n_meth==5,'expected 5 methods');
 
 RMSE_r  = nan(n_meth,n_r);
 RMSE_th = nan(n_meth,n_r);
@@ -98,9 +99,8 @@ end
 
 % ---- Plot -- unified legend below, no per-subplot legends ---------------
 fig5 = figure('Name','Fig5_NearFar','Position',[100 100 900 380]);
-styles={'-o','-s','--^','-.d','-v','-.h'};
-colors={[0 0.45 0.74],[0.85 0.33 0.10],[0.47 0.67 0.19],...
-        [0.49 0.18 0.56],[0.93 0.69 0.13],[0.30 0.57 0.43]};
+styles={'-o','-s','--^',':d','-.h'};
+colors={[0 0.45 0.74],[0.85 0.33 0.10],[0.47 0.67 0.19],[0.49 0.18 0.56],[0.30 0.57 0.43]};
 x_ax = rmax_fac_vec;
 ebrd_fac = P.r_EBRD_fac;
 rrd_fac  = 1.0;
@@ -147,18 +147,17 @@ sgtitle(['Fig.5: Near ' char(8594) ' Far Transition Sweep'],'FontSize',13);
 
 % Unified single legend centred below all three panels
 % filled_idx = [1 2]: CL-KL and P-SOMP are compressed-domain (filled markers)
-% All other methods (DL-OMP, MUSIC+Tri, DFrFT-NOMP, BF-SOMP) are open markers
 nf_add_legend(fig5, methods, styles, colors, 'FontSize',8, 'filled_idx',[1 2]);
 % Height 9.5 cm (+1.5 cm vs original 8.0) to accommodate unified legend
-nf_export_fig(gcf, 'fig5_nearfar', 'double', 'Height', 9.5);
+nf_export_fig(gcf, 'fig5_nearfar', 'double', 'Height', 9.0);
 fprintf('Fig.5 -> fig5_nearfar.pdf  |  CSV -> %s\n', CSV);
 end
 
 
 % ====================================================================
 function res = mc_trial(Xm, Hm, tht, rt, Wm, Ym, Rm, P, r_RD_base)
-%MC_TRIAL  Run CL-KL, P-SOMP, DL-OMP, MUSIC+Tri, DFrFT-NOMP, BF-SOMP on one trial.
-nm=nan(6,1); rth=nan(6,1); rr=nan(6,1); fl=nan(6,1);
+%MC_TRIAL  Run CL-KL, P-SOMP, DL-OMP, DFrFT-NOMP on one trial.
+nm=nan(5,1); rth=nan(5,1); rr=nan(5,1); fl=nan(5,1);
 ci_iter=nan; ci_conv=nan; ci_n0=nan;
 
 try; [th,rh,~,~,ci]=nf_clkl(Rm,Wm,P);
@@ -177,20 +176,16 @@ try; [th,rh]=nf_zhang(Xm,Wm,P);
     rth(3)=a*180/pi; rr(3)=b; fl(3)=c*100;
 catch; nm(3)=1; rr(3)=r_RD_base; fl(3)=100; end
 
-try; [th,rh]=nf_music_tri(Xm,Wm,P);
+try; [th,rh]=nf_dfrft_nomp(Xm,Wm,P);
     [nm(4),a,b,c]=nf_metrics(th,rh,Ym,Wm,Hm,tht,rt,P);
     rth(4)=a*180/pi; rr(4)=b; fl(4)=c*100;
 catch; nm(4)=1; rr(4)=r_RD_base; fl(4)=100; end
 
-try; [th,rh]=nf_dfrft_nomp(Xm,Wm,P);
-    [nm(5),a,b,c]=nf_metrics(th,rh,Ym,Wm,Hm,tht,rt,P);
-    rth(5)=a*180/pi; rr(5)=b; fl(5)=c*100;
-catch; nm(5)=1; rr(5)=r_RD_base; fl(5)=100; end
 
 try; [th,rh]=nf_bfsomp(Xm,Wm,P);
-    [nm(6),a,b,c]=nf_metrics(th,rh,Ym,Wm,Hm,tht,rt,P);
-    rth(6)=a*180/pi; rr(6)=b; fl(6)=c*100;
-catch; nm(6)=1; fl(6)=100; end
+    [nm(5),a,b,c]=nf_metrics(th,rh,Ym,Wm,Hm,tht,rt,P);
+    rth(5)=a*180/pi; rr(5)=b; fl(5)=c*100;
+catch; nm(5)=1; fl(5)=100; end
 res = struct('nm',nm,'rth',rth,'rr',rr,'fl',fl, ...
     'ci_iter',ci_iter,'ci_conv',ci_conv,'ci_n0',ci_n0);
 end

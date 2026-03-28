@@ -24,6 +24,7 @@ function run_fig9_convergence(fast, use_par)
 %
 if nargin < 1; fast = false;  end
 if nargin < 2; use_par = false; end  %#ok -- reserved for future use
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 CSV = 'nf_simulation_results.csv';
 
@@ -133,7 +134,7 @@ for si = 1:n_snr
 end
 sgtitle('Fig.9: CL-KL Convergence -- KL Objective DeltaL(iter) per SNR','FontSize',13);
 % Height 11 cm as before -- no legend strip needed for this figure
-nf_export_fig(gcf, 'fig9_convergence', 'double', 'Height', 7.0);
+nf_export_fig(gcf, 'fig9_convergence', 'double', 'Height', 10.0);
 
 % ---- Fig.9b: convergence stats (3 bar subplots, no legend needed) ---
 fig9b = figure('Name','Fig9b_ConvStats','Position',[120 120 560 280]);

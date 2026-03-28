@@ -7,6 +7,7 @@ function run_fig6_runtime(fast, use_par)  %#ok<INUSD>
 %  Serial MC intentional -- measures true single-core per-method cost.
 if nargin < 1; fast = false; end
 % use_par intentionally ignored -- serial timing is required for Fig.6
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 CSV = 'nf_simulation_results.csv';
 

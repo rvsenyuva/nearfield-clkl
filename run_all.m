@@ -52,6 +52,15 @@ if use_par
     end
 end
 
+% ---- Reproducibility -----------------------------------------------
+% Reset global RNG here so run_all always produces the same numbers.
+% Each run_fig*.m also resets the same seed for standalone use.
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
+if exist('nf_simulation_results.csv','file')
+    delete('nf_simulation_results.csv');
+    fprintf('  Cleared nf_simulation_results.csv for fresh run.\n');
+end
+
 print_table1();
 
 t_total = tic;

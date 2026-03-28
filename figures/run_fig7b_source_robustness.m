@@ -33,6 +33,7 @@ function run_fig7b_source_robustness(fast, use_par)
 %
 if nargin < 1; fast = false; end
 if nargin < 2; use_par = false; end
+rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
 
 CSV   = 'nf_simulation_results.csv';
 P     = nf_params();
