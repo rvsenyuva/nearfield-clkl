@@ -152,7 +152,7 @@ xline(d_id+0.5,'--k','LineWidth',1.2, ...
     'HandleVisibility','off');
 xlabel('Number of paths d','FontSize',12);
 ylabel('NMSE (dB)','FontSize',12);
-title('Fig.8: Channel NMSE vs Number of Paths d','FontSize',13);
+% title() call removed (P6.1): LaTeX caption is canonical.
 grid on; set(gca,'XTick',d_vec,'FontSize',11);
 % NumColumns=2 -> 4 rows; narrower box fits single-column width
 leg8 = legend('Orientation','horizontal','NumColumns',2, ...
@@ -172,7 +172,8 @@ end
 plot(d_vec, CRB_theta,'k--','LineWidth',2,'DisplayName','CRB');
 xline(d_id+0.5,'--','Color',[0.5 0.5 0.5],'LineWidth',1.0,'HandleVisibility','off');
 xlabel('d','FontSize',12); ylabel('RMSE(\theta) [deg]','FontSize',12);
-title('Angle RMSE vs d','FontSize',13); grid on; set(gca,'XTick',d_vec);
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on; set(gca,'XTick',d_vec);
 
 subplot(1,2,2);
 for mi = 1:n_meth
@@ -182,9 +183,10 @@ end
 semilogy(d_vec, CRB_r_m,'k--','LineWidth',2,'DisplayName','CRB');
 xline(d_id+0.5,'--','Color',[0.5 0.5 0.5],'LineWidth',1.0,'HandleVisibility','off');
 xlabel('d','FontSize',12); ylabel('RMSE(r) [m]','FontSize',12);
-title('Range RMSE vs d','FontSize',13); grid on; set(gca,'XTick',d_vec);
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on; set(gca,'XTick',d_vec);
 
-sgtitle('Fig.8b: RMSE vs d with CRB','FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 % Unified legend: 7 methods + CRB
 methods8b = [methods, {'CRB'}];
 styles8b  = [styles7, {'--'}];

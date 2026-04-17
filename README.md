@@ -6,7 +6,7 @@ MATLAB simulation code for the paper:
 
 > R. V. Şenyuva, "Covariance-Domain Near-Field Channel Estimation under Hybrid
 > Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting,"
-> *IEEE Transactions on Wireless Communications*, submitted March 2026.
+> *IEEE Transactions on Communications*, submitted 2026.
 
 ---
 
@@ -171,6 +171,11 @@ rng(42, 'twister')   % fixed seed — already set inside each run_fig*.m
 run_all('parfor')    % regenerates all figures and nf_simulation_results.csv
 run_ablation(true)   % regenerates ablation table (nf_ablation_results.csv)
 ```
+**Note (P6.1 revision, April 2026):** `plot_fig.m` and six `run_fig*.m` scripts were
+updated to remove embedded `title()` text from exported figure PDFs. The LaTeX captions
+in the paper are the canonical figure titles; the PDFs no longer carry duplicate text at
+the top. Simulation parameters, seed, and CSV schema are unchanged. The included
+`nf_simulation_results.csv` reflects Run 4 (17 April 2026, MATLAB R2025b).
 
 Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 - Full suite (`run_all('parfor')`): ~10 minutes
@@ -247,9 +252,9 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
   title   = {Covariance-Domain Near-Field Channel Estimation under Hybrid
              Compression: {USW/Fresnel} Model, Curvature Learning, and
              {KL} Covariance Fitting},
-  journal = {IEEE Transactions on Wireless Communications},
+  journal = {IEEE Transactions on Communications},
   year    = {2026},
-  note    = {Submitted}
+  note    = {Under revision for resubmission}
 }
 ```
 

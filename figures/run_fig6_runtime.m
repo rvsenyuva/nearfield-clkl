@@ -88,7 +88,8 @@ for mi=1:n_meth
         'LineWidth',1.5,'MarkerSize',8,'DisplayName',methods{mi}); hold on;
 end
 xlabel('Array size M','FontSize',12); ylabel('Runtime per trial [s]','FontSize',12);
-title('Computational Scaling','FontSize',13); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 xticks(M_vec);
 
 subplot(1,2,2);
@@ -97,9 +98,10 @@ for mi=1:n_meth
         'LineWidth',1.5,'MarkerSize',8,'DisplayName',methods{mi}); hold on;
 end
 xlabel('Array size M','FontSize',12); ylabel('NMSE (dB)','FontSize',12);
-title('NMSE at each M','FontSize',13); grid on; xticks(M_vec);
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on; xticks(M_vec);
 
-sgtitle('Fig.6: Runtime vs M (Scaling)','FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 % Unified single legend: filled_idx=[1 2] for CL-KL, P-SOMP
 nf_add_legend(fig6, methods, styles, colors, 'FontSize',8, 'filled_idx',[1 2]);
 % Height 8.5 cm (+1.5 cm vs original 7.0)

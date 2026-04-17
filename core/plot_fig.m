@@ -3,6 +3,10 @@ function plot_fig(x_vec, NMSE_db, NMSE_std, methods, title_str, xlabel_str, fig_
 %  Optional name-value pairs:
 %    'NumColumns'  - legend columns (default 3)
 %    'LegTitle'    - legend title string (default standard; '' to suppress)
+%
+%  title_str is accepted for API compatibility but the figure title is
+%  suppressed (P6.1: embedded titles removed; LaTeX captions are canonical).
+%
 p = inputParser();
 p.addParameter('NumColumns', 3,       @isnumeric);
 p.addParameter('LegTitle',   'Filled: compressed | Open: full-array', @ischar);
@@ -42,7 +46,7 @@ for mi = 1:n_meth
 end
 xlabel(xlabel_str, 'FontSize', 12);
 ylabel('NMSE (dB)', 'FontSize', 12);
-title(title_str, 'FontSize', 13);
+% title() call removed (P6.1): LaTeX captions are canonical.
 grid on;
 set(gca, 'FontSize', 11);
 

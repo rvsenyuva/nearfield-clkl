@@ -111,7 +111,8 @@ for mi=1:n_meth
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('RMSE(r) [m]','FontSize',11);
-title('Range RMSE','FontSize',12); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,...
     'Label','r_{EBRD}','LabelVerticalAlignment','bottom',...
     'LabelHorizontalAlignment','right','HandleVisibility','off');
@@ -125,7 +126,8 @@ for mi=1:n_meth
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('RMSE(\theta) [deg]','FontSize',11);
-title('Angle RMSE','FontSize',12); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,'HandleVisibility','off');
 xline(rrd_fac,'--k','LineWidth',1.2,'HandleVisibility','off');
 
@@ -135,7 +137,8 @@ for mi=1:n_meth
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('NMSE (dB)','FontSize',11);
-title('Channel NMSE','FontSize',12); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,'Label','EBRD',...
     'LabelVerticalAlignment','top','LabelHorizontalAlignment','right',...
     'HandleVisibility','off');
@@ -143,7 +146,7 @@ xline(rrd_fac,'--k','LineWidth',1.2,'Label','r_{RD}',...
     'LabelVerticalAlignment','top','LabelHorizontalAlignment','left',...
     'HandleVisibility','off');
 
-sgtitle(['Fig.5: Near ' char(8594) ' Far Transition Sweep'],'FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 
 % Unified single legend centred below all three panels
 % filled_idx = [1 2]: CL-KL and P-SOMP are compressed-domain (filled markers)

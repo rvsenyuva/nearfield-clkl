@@ -123,7 +123,8 @@ for mi=1:n_meth
 end
 plot(SNR_vec,CRB_theta_deg,'k--','LineWidth',2,'DisplayName','CRB');
 xlabel('SNR (dB)','FontSize',12); ylabel('RMSE(\theta) [deg]','FontSize',12);
-title('Angle RMSE vs SNR','FontSize',13); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 
 subplot(1,2,2);
 for mi=1:n_meth
@@ -132,9 +133,10 @@ for mi=1:n_meth
 end
 semilogy(SNR_vec,CRB_r_m,'k--','LineWidth',2,'DisplayName','CRB');
 xlabel('SNR (dB)','FontSize',12); ylabel('RMSE(r) [m]','FontSize',12);
-title('Range RMSE vs SNR','FontSize',13); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+grid on;
 
-sgtitle('Fig.2b: RMSE vs SNR with CRB','FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 % Unified legend: 7 entries (6 methods + CRB); append CRB style manually
 methods_crb = [methods, {'CRB'}];
 styles_crb  = [styles6, {'--'}];

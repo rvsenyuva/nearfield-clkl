@@ -132,7 +132,7 @@ for mi = 1:n_meth
         'LineWidth',1.0,'HandleVisibility','off');
 end
 xlabel('SNR (dB)','FontSize',12); ylabel('NMSE (dB)','FontSize',12);
-title({'Gaussian (solid) vs QPSK (dashed)','All 6 methods'},'FontSize',12);
+% title() call removed (P6.1): LaTeX caption is canonical.
 grid on;
 
 % --- Right panel: NMSE gap per method ------------------------------------
@@ -146,10 +146,10 @@ end
 yline(0,'--k','LineWidth',1.2,'HandleVisibility','off');
 xlabel('SNR (dB)','FontSize',12);
 ylabel('NMSE gap [dB] (QPSK - Gauss)','FontSize',12);
-title({'Source model robustness gap','positive = QPSK worse'},'FontSize',12);
+% title() call removed (P6.1): LaTeX caption is canonical.
 grid on; ylim([-3 3]);
 
-sgtitle(sprintf('Fig.7b: Source Model Robustness -- Gaussian vs QPSK Pilots\n\n'), 'FontSize', 12);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 
 % Unified single legend centred below both panels (methods only; QPSK
 % curves are dashed same-colour and explained in title/caption).

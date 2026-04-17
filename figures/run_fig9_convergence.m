@@ -128,11 +128,12 @@ for si = 1:n_snr
 
     xlabel('Iteration','FontSize',11);
     if si == 1; ylabel('Delta L (normalised)','FontSize',11); end
+    % RETAINED: per-panel SNR title is the sole identifier for each subplot.
     title(sprintf('SNR = %+d dB', SNR_vec(si)),'FontSize',12);
     xlim([1, min(P.max_iter, max(conv_iters(si,:))+5)]);
     grid on; set(gca,'FontSize',10);
 end
-sgtitle('Fig.9: CL-KL Convergence -- KL Objective DeltaL(iter) per SNR','FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 % Height 11 cm as before -- no legend strip needed for this figure
 nf_export_fig(gcf, 'fig9_convergence', 'double', 'Height', 10.0);
 
@@ -148,21 +149,24 @@ end
 subplot(1,3,1);
 bar(SNR_vec, stats(:,1), 'FaceColor',[0 0.45 0.74]);
 xlabel('SNR (dB)','FontSize',11); ylabel('Avg iterations','FontSize',11);
-title('Avg iters','FontSize',12); ylim([0 P.max_iter+5]); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+ylim([0 P.max_iter+5]); grid on;
 yline(P.max_iter,'--k','max','HandleVisibility','off');
 
 subplot(1,3,2);
 bar(SNR_vec, stats(:,2), 'FaceColor',[0.47 0.67 0.19]);
 xlabel('SNR (dB)','FontSize',11); ylabel('Conv. %','FontSize',11);
-title('Converged %','FontSize',12); ylim([0 110]); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+ylim([0 110]); grid on;
 
 subplot(1,3,3);
 bar(SNR_vec, stats(:,3), 'FaceColor',[0.85 0.33 0.10]);
 xlabel('SNR (dB)','FontSize',11); ylabel('N0_{hat}/N0_{true}','FontSize',11);
-title('N0 ratio','FontSize',12); ylim([0 2]); grid on;
+% title() call removed (P6.1): LaTeX caption is canonical.
+ylim([0 2]); grid on;
 yline(1.0,'--k','ideal','HandleVisibility','off');
 
-sgtitle('Fig.9b: CL-KL Convergence Statistics','FontSize',13);
+% sgtitle removed (P6.1): LaTeX caption is canonical.
 % FIX: use nf_export_fig (not saveas) so paper size is controlled
 % Height 7.0 cm -- bar charts need no extra legend strip
 nf_export_fig(fig9b, 'fig9b_conv_stats', 'double', 'Height', 7.0);
