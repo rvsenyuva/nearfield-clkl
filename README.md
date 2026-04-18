@@ -6,7 +6,7 @@ MATLAB simulation code for the paper:
 
 > R. V. Şenyuva, "Covariance-Domain Near-Field Channel Estimation under Hybrid
 > Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting,"
-> *IEEE Transactions on Communications*, submitted 2026.
+> *IEEE Transactions on Wireless Communications*, submitted March 2026.
 
 ---
 
@@ -94,7 +94,7 @@ cd('/path/to/nearfield_sim')
 setup
 
 % 2. Verify installation
-test_modules   % should print: 10 PASSED, 0 FAILED
+test_modules   % should print: 11 PASSED, 0 FAILED
 test_fixes     % should print: 13 PASSED, 0 FAILED
 
 % 3. Run all figures (parallel, ~10 min on 6-core machine)
@@ -105,7 +105,7 @@ run_ablation(true)
 ```
 
 Output files written to the working directory:
-- `nf_simulation_results.csv` — all figure results (28 columns)
+- `nf_simulation_results.csv` — all figure results (30 columns)
 - `nf_ablation_results.csv`   — ablation results (9 columns)
 - `fig2_nmse_snr.pdf`, `fig3_nmse_nrf.pdf`, … — publication-ready figures
 
@@ -171,11 +171,6 @@ rng(42, 'twister')   % fixed seed — already set inside each run_fig*.m
 run_all('parfor')    % regenerates all figures and nf_simulation_results.csv
 run_ablation(true)   % regenerates ablation table (nf_ablation_results.csv)
 ```
-**Note (P6.1 revision, April 2026):** `plot_fig.m` and six `run_fig*.m` scripts were
-updated to remove embedded `title()` text from exported figure PDFs. The LaTeX captions
-in the paper are the canonical figure titles; the PDFs no longer carry duplicate text at
-the top. Simulation parameters, seed, and CSV schema are unchanged. The included
-`nf_simulation_results.csv` reflects Run 4 (17 April 2026, MATLAB R2025b).
 
 Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 - Full suite (`run_all('parfor')`): ~10 minutes
@@ -186,7 +181,7 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 
 ## CSV Output Schema
 
-### `nf_simulation_results.csv` (28 columns)
+### `nf_simulation_results.csv` (30 columns)
 
 | Column | Description |
 |--------|-------------|
@@ -211,6 +206,8 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 | `clkl_N0_mean` | Mean N̂₀ estimate (CL-KL rows only) |
 | `CRB_theta_deg` | Compressed-domain CRB angle [deg] (CL-KL rows only) |
 | `CRB_r_m` | Compressed-domain CRB range [m] (CL-KL rows only) |
+| `CRB_theta_full_deg` | Full-array CRB angle [deg] (CL-KL rows only) |
+| `CRB_r_full_m` | Full-array CRB range [m] (CL-KL rows only) |
 | `notes` | Free text |
 
 ### `nf_ablation_results.csv` (9 columns)
@@ -254,7 +251,7 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
              {KL} Covariance Fitting},
   journal = {IEEE Transactions on Communications},
   year    = {2026},
-  note    = {Under revision for resubmission}
+  note    = {Resubmitted May 2026}
 }
 ```
 

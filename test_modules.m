@@ -19,7 +19,7 @@ addpath(this_dir);
 
 clear; clc;
 fprintf('================================================================\n');
-fprintf('  MODULE SMOKE TESTS (5 estimators)\n');
+fprintf('  MODULE SMOKE TESTS (5 estimators + CRB)\n');
 fprintf('================================================================\n\n');
 
 P   = nf_params();
@@ -260,6 +260,62 @@ catch ME
     fail('nf_crb (T15)', ME.message);
 end
 
+% --- T16: nf_crb — full-array branch + DPI monotonicity + regression guard ---
+fprintf('\n--- T16: nf_crb (full-array DPI monotonicity + regression guard) ---\n');
+try
+    % Use same seed as the run scripts for reproducibility
+    rng(42, 'twister');
+    [X_t16,~,~,th_t16,r_t16,p_t16,N0_t16] = nf_gen_channel(P, 10, true);
+    [W_t16,~,~] = nf_hybrid_combiner(X_t16, P);
+
+    % (a) Compressed branch — bit-identical regression guard
+    %     Call with explicit 'compressed' mode and without mode arg; must match.
+    [crb_th_c1, crb_r_c1] = nf_crb(th_t16, r_t16, p_t16, N0_t16, W_t16, P, 'compressed');
+    [crb_th_c2, crb_r_c2] = nf_crb(th_t16, r_t16, p_t16, N0_t16, W_t16, P);
+    assert(crb_th_c1 == crb_th_c2, ...
+        sprintf('Regression: explicit ''compressed'' (%.10g) ~= default (%.10g)', ...
+        crb_th_c1, crb_th_c2));
+    assert(crb_r_c1 == crb_r_c2, ...
+        sprintf('Regression: r_comp explicit (%.10g) ~= default (%.10g)', ...
+        crb_r_c1, crb_r_c2));
+
+    % (b) Full-array branch
+    [crb_th_f, crb_r_f] = nf_crb(th_t16, r_t16, p_t16, N0_t16, W_t16, P, 'full');
+    assert(isfinite(crb_th_f) && crb_th_f > 0, ...
+        sprintf('CRB_theta_full not positive finite: %.4f', crb_th_f));
+    assert(isfinite(crb_r_f) && crb_r_f > 0, ...
+        sprintf('CRB_r_full not positive finite: %.4f', crb_r_f));
+
+    % (c) DPI monotonicity: full-array CRB < compressed CRB (strict, N_RF=8 < M=64)
+    assert(crb_th_f < crb_th_c1, ...
+        sprintf('DPI violation (theta): CRB_full=%.6f >= CRB_comp=%.6f', ...
+        crb_th_f, crb_th_c1));
+    assert(crb_r_f < crb_r_c1, ...
+        sprintf('DPI violation (r): CRB_full=%.6f >= CRB_comp=%.6f', ...
+        crb_r_f, crb_r_c1));
+
+    % (d) 'both' mode returns consistent struct
+    crb_s = nf_crb(th_t16, r_t16, p_t16, N0_t16, W_t16, P, 'both');
+    assert(isstruct(crb_s), '''both'' mode must return a struct');
+    assert(all(isfield(crb_s, {'theta_comp','r_comp','theta_full','r_full'})), ...
+        'struct missing one or more required fields');
+    assert(crb_s.theta_comp == crb_th_c1, ...
+        'struct theta_comp != scalar compressed result');
+    assert(crb_s.r_comp == crb_r_c1, ...
+        'struct r_comp != scalar compressed result');
+    assert(crb_s.theta_full == crb_th_f, ...
+        'struct theta_full != scalar full result');
+    assert(crb_s.r_full == crb_r_f, ...
+        'struct r_full != scalar full result');
+
+    pass(sprintf('CRB DPI: theta_comp=%.4fdeg > theta_full=%.4fdeg; r_comp=%.4fm > r_full=%.4fm', ...
+        crb_th_c1, crb_th_f, crb_r_c1, crb_r_f));
+    n_pass = n_pass + 1;
+catch ME
+    fail('nf_crb DPI (T16)', ME.message);
+    n_fail = n_fail + 1;
+end
+
 % ====================================================================
 %  Summary
 % ====================================================================
@@ -273,3 +329,4 @@ if n_fail == 0
 else
     fprintf('Fix the FAILED tests before running test_fixes.m.\n\n');
 end
+
