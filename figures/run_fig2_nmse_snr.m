@@ -2,6 +2,15 @@ function run_fig2_nmse_snr(fast, use_par)
 %  use_par : logical  (default false) -- pass true to use parfor across MC trials
 %RUN_FIG2_NMSE_SNR  Fig. 2 -- NMSE vs SNR (primary figure).
 %  Results written to nf_simulation_results.csv after each SNR point.
+%
+%  P9.2 changes (19 April 2026):
+%    - CRB loop now calls nf_crb(..., 'both') and extracts both
+%      compressed and full-array CRB structs.
+%    - save_results_csv now receives crb_theta_full_deg and crb_r_full_m
+%      as new args 28-29 (30-column schema, P9.1).
+%    - Fig.2b RMSE panels gain a second dash-dot CRB line for the
+%      full-array bound; existing compressed CRB line style is unchanged.
+%    - All method simulation code is bit-identical to Run 4.
 if nargin < 1; fast = false; end
 if nargin < 2; use_par = false; end
 rng(42, 'twister');  % Fixed seed: ensures bit-exact reproducibility across runs
@@ -21,9 +30,13 @@ methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
 assert(n_meth==6,'expected 6 methods');
 NMSE_db = nan(n_meth, n_snr);  NMSE_std = nan(n_meth, n_snr);
-% CRB arrays (averaged over MC trials)
-CRB_theta_deg = nan(1, n_snr);   % RMSE lower bound [deg]
-CRB_r_m       = nan(1, n_snr);   % RMSE lower bound [m]
+
+% CRB arrays — compressed and full-array (median over MC trials)
+CRB_theta_deg      = nan(1, n_snr);   % compressed CRB angle [deg]
+CRB_r_m            = nan(1, n_snr);   % compressed CRB range [m]
+CRB_theta_full_deg = nan(1, n_snr);   % full-array CRB angle [deg]  (P9.2)
+CRB_r_full_m       = nan(1, n_snr);   % full-array CRB range [m]    (P9.2)
+
 RMSE_th_all   = nan(n_meth, n_snr);   % for Fig.2b
 RMSE_r_all    = nan(n_meth, n_snr);   % for Fig.2b
 
@@ -35,19 +48,33 @@ for si = 1:n_snr
 
     [X_all,H_all,th_all,r_all,W_all,Y_all,R_all] = pregen(P, SNR, true);
 
-    % CRB: average over MC trials using true parameters
-    crb_th_mc = nan(1,P.N_MC);  crb_r_mc = nan(1,P.N_MC);
+    % -----------------------------------------------------------------
+    % CRB: call nf_crb with mode='both' to obtain compressed AND
+    % full-array bounds in one pass.  Average over MC trials.
+    % -----------------------------------------------------------------
+    crb_th_mc      = nan(1, P.N_MC);
+    crb_r_mc       = nan(1, P.N_MC);
+    crb_th_full_mc = nan(1, P.N_MC);
+    crb_r_full_mc  = nan(1, P.N_MC);
+
     for mc_crb = 1:P.N_MC
         [X_crb,~,~,th_crb,r_crb,p_crb,N0_crb] = ...
             nf_gen_channel(P, SNR, true);
         [W_crb,~,~] = nf_hybrid_combiner(X_crb, P);
         try
-            [crb_th_mc(mc_crb), crb_r_mc(mc_crb)] = ...
-                nf_crb(th_crb, r_crb, p_crb, N0_crb, W_crb, P);
+            % 'both' mode returns a struct with four fields
+            crb_s = nf_crb(th_crb, r_crb, p_crb, N0_crb, W_crb, P, 'both');
+            crb_th_mc(mc_crb)      = crb_s.theta_comp;
+            crb_r_mc(mc_crb)       = crb_s.r_comp;
+            crb_th_full_mc(mc_crb) = crb_s.theta_full;
+            crb_r_full_mc(mc_crb)  = crb_s.r_full;
         catch; end
     end
-    CRB_theta_deg(si) = nanmedian(crb_th_mc);   % median robust to ill-cond outliers
-    CRB_r_m(si)       = nanmedian(crb_r_mc);
+    % Median: robust to ill-conditioned outliers (same aggregation as Run 4)
+    CRB_theta_deg(si)      = nanmedian(crb_th_mc);
+    CRB_r_m(si)            = nanmedian(crb_r_mc);
+    CRB_theta_full_deg(si) = nanmedian(crb_th_full_mc);
+    CRB_r_full_m(si)       = nanmedian(crb_r_full_mc);
 
     nmse_mc    = nan(n_meth,P.N_MC);
     rmse_th_mc = nan(n_meth,P.N_MC);
@@ -79,10 +106,15 @@ for si = 1:n_snr
     RMSE_th_all(:,si)=rth_pt;  RMSE_r_all(:,si)=rr_pt;
     fprintf('done. CL-KL NMSE = %.1f dB\n', NMSE_db(1,si));
 
+    % -----------------------------------------------------------------
+    % save_results_csv: pass both compressed and full-array CRBs
+    % (new args 28-29 per 30-column schema from P9.1)
+    % -----------------------------------------------------------------
     save_results_csv(CSV,'Fig2','NMSE_vs_SNR','primary', ...
         P.M,P.N_RF,P.N,P.d,SNR,'SNR_dB',SNR,'exact_USW', ...
         methods,nmse_pt,nstd_pt,rth_pt,rr_pt,fail_pt,[],[],P.N_MC,P.r_RD, ...
-        c_iters,c_conv,c_N0, CRB_theta_deg(si), CRB_r_m(si));
+        c_iters,c_conv,c_N0, CRB_theta_deg(si), CRB_r_m(si), ...
+        CRB_theta_full_deg(si), CRB_r_full_m(si));
 end
 
 
@@ -109,7 +141,14 @@ end
 % Height 9.5 cm: +2 cm vs original 7.5 to accommodate below-axes legend
 nf_export_fig(gcf, 'fig2_nmse_snr', 'double', 'Height', 9.5);
 
-% ---- Fig.2b: RMSE_theta and RMSE_r with unified legend below --------
+% ---- Fig.2b: RMSE_theta and RMSE_r with dual CRB lines and unified legend ---
+%
+%  P9.2: two CRB lines per panel
+%    - compressed CRB : black dashed ('k--'), label 'CRB (compressed)'
+%      (style unchanged from Run 4 — was labelled 'CRB')
+%    - full-array CRB : grey dash-dot (colour [0.5 0.5 0.5], '--.',
+%      LineWidth 1.5), label 'CRB (full)'
+%
 styles6={'-o','-s','--^','-.d','-v','-.h'};
 colors6={[0 0.45 0.74],[0.85 0.33 0.10],[0.47 0.67 0.19], ...
          [0.49 0.18 0.56],[0.93 0.69 0.13],[0.30 0.57 0.43]};
@@ -121,7 +160,11 @@ for mi=1:n_meth
     plot(SNR_vec,RMSE_th_db(mi,:),styles6{mi},'Color',colors6{mi}, ...
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
-plot(SNR_vec,CRB_theta_deg,'k--','LineWidth',2,'DisplayName','CRB');
+% Compressed CRB — black dashed (unchanged from Run 4, label updated)
+plot(SNR_vec,CRB_theta_deg,'k--','LineWidth',2,'DisplayName','CRB (compressed)');
+% Full-array CRB — grey dash-dot (P9.2 addition)
+plot(SNR_vec,CRB_theta_full_deg,'--','Color',[0.5 0.5 0.5],'LineWidth',1.5, ...
+    'LineStyle','-.','DisplayName','CRB (full)');
 xlabel('SNR (dB)','FontSize',12); ylabel('RMSE(\theta) [deg]','FontSize',12);
 % title() call removed (P6.1): LaTeX caption is canonical.
 grid on;
@@ -131,18 +174,22 @@ for mi=1:n_meth
     semilogy(SNR_vec,RMSE_r_db(mi,:),styles6{mi},'Color',colors6{mi}, ...
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
-semilogy(SNR_vec,CRB_r_m,'k--','LineWidth',2,'DisplayName','CRB');
+% Compressed CRB — black dashed (unchanged from Run 4, label updated)
+semilogy(SNR_vec,CRB_r_m,'k--','LineWidth',2,'DisplayName','CRB (compressed)');
+% Full-array CRB — grey dash-dot (P9.2 addition)
+semilogy(SNR_vec,CRB_r_full_m,'-.','Color',[0.5 0.5 0.5],'LineWidth',1.5, ...
+    'DisplayName','CRB (full)');
 xlabel('SNR (dB)','FontSize',12); ylabel('RMSE(r) [m]','FontSize',12);
 % title() call removed (P6.1): LaTeX caption is canonical.
 grid on;
 
 % sgtitle removed (P6.1): LaTeX caption is canonical.
-% Unified legend: 7 entries (6 methods + CRB); append CRB style manually
-methods_crb = [methods, {'CRB'}];
-styles_crb  = [styles6, {'--'}];
-colors_crb  = [colors6, {[0 0 0]}];
+% Unified legend: 8 entries (6 methods + 2 CRB lines)
+methods_crb = [methods, {'CRB (compressed)', 'CRB (full)'}];
+styles_crb  = [styles6, {'--', '-.'}];
+colors_crb  = [colors6, {[0 0 0], [0.5 0.5 0.5]}];
 nf_add_legend(fig2b, methods_crb, styles_crb, colors_crb, ...
-    'FontSize', 8, 'filled_idx', [1 2]);
+    'FontSize', 8, 'filled_idx', [1 2], 'NumColumns', 4);
 % Height 8.5 cm: +1.5 cm vs original 7.0 to accommodate unified legend
 nf_export_fig(fig2b, 'fig2b_rmse_crb', 'double', 'Height', 8.5);
 fprintf('Fig.2b -> fig2b_rmse_crb.pdf\n');
