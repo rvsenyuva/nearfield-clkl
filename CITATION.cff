@@ -1,4 +1,4 @@
-cff-version: 1.2.0
+cff-version: 1.1.0
 message: "If you use this code, please cite the paper and the software as below."
 title: "Covariance-Domain Near-Field Channel Estimation under Hybrid Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting — Simulation Code"
 authors:
