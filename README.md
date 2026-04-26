@@ -6,14 +6,14 @@ MATLAB simulation code for the paper:
 
 > R. V. Şenyuva, "Covariance-Domain Near-Field Channel Estimation under Hybrid
 > Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting,"
-> *IEEE Transactions on Wireless Communications*, submitted March 2026.
+> *IEEE Transactions on Communications*, submitted April 2026.
 
 ---
 
 ## Overview
 
 This repository contains the complete simulation codebase for the CL-KL near-field
-channel estimator and all six comparison baselines. The code reproduces all 10
+channel estimator and all six comparison baselines. The code reproduces all 11
 figures and tables in the paper from scratch using a fixed random seed.
 
 **Key result:** CL-KL achieves the lowest channel NMSE among all six evaluated
@@ -97,7 +97,7 @@ setup
 test_modules   % should print: 11 PASSED, 0 FAILED
 test_fixes     % should print: 13 PASSED, 0 FAILED
 
-% 3. Run all figures (parallel, ~10 min on 6-core machine)
+% 3. Run all figures (parallel, ~5 minutes on 6-core machine)
 run_all('parfor')
 
 % 4. Run ablation study separately (~1 min with parfor)
@@ -135,10 +135,10 @@ Rayleigh distance: r_RD = 2D²/λ = 21.26 m at M = 64, f_c = 28 GHz.
 ## Simulation Modes
 
 ```matlab
-run_all             % Serial, full N_MC=400  (~2–4 h)
-run_all('parfor')   % Parallel, full N_MC=400 (~10 min, 6 cores)
-run_all('fast')     % Serial, N_MC=20 preview (~15 min)
-run_all('fast parfor') % Parallel, N_MC=20 preview (~2 min)
+run_all             % Serial, full N_MC=400  (~20–40 min)
+run_all('parfor')   % Parallel, full N_MC=400 (~5 min, 6 cores)
+run_all('fast')     % Serial, N_MC=20 preview (~8 min)
+run_all('fast parfor') % Parallel, N_MC=20 preview (~1 min)
 ```
 
 Note: Fig. 6 (runtime measurement) always runs serially regardless of mode,
@@ -251,7 +251,7 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
              {KL} Covariance Fitting},
   journal = {IEEE Transactions on Communications},
   year    = {2026},
-  note    = {Resubmitted May 2026}
+  note    = {Submitted April 2026}
 }
 ```
 
