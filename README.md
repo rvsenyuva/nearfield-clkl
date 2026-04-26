@@ -173,7 +173,7 @@ run_ablation(true)   % regenerates ablation table (nf_ablation_results.csv)
 ```
 
 Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
-- Full suite (`run_all('parfor')`): ~10 minutes
+- Full suite (`run_all('parfor')`): ~5 minutes
 - Ablation (`run_ablation(true)`): ~1 minute
 - Test suites: ~30 seconds combined
 
@@ -204,10 +204,10 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 | `clkl_avg_iters` | Mean CL-KL iterations (CL-KL rows only) |
 | `clkl_conv_pct` | % CL-KL converged (CL-KL rows only) |
 | `clkl_N0_mean` | Mean N̂₀ estimate (CL-KL rows only) |
-| `CRB_theta_deg` | Compressed-domain CRB angle [deg] (CL-KL rows only) |
-| `CRB_r_m` | Compressed-domain CRB range [m] (CL-KL rows only) |
-| `CRB_theta_full_deg` | Full-array CRB angle [deg] (CL-KL rows only) |
-| `CRB_r_full_m` | Full-array CRB range [m] (CL-KL rows only) |
+| `CRB_theta_deg` | Compressed-domain CRB angle [deg] |
+| `CRB_r_m` | Compressed-domain CRB range [m] |
+| `CRB_theta_full_deg` | Full-array CRB angle [deg] |
+| `CRB_r_full_m` | Full-array CRB range [m] |
 | `notes` | Free text |
 
 ### `nf_ablation_results.csv` (9 columns)
