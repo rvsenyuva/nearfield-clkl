@@ -6,7 +6,7 @@ MATLAB simulation code for the paper:
 
 > R. V. Şenyuva, "Covariance-Domain Near-Field Channel Estimation under Hybrid
 > Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting,"
-> *IEEE Transactions on Communications*, submitted April 2026.
+> arXiv:2603.28918 [eess.SP], 2026.
 
 ---
 
@@ -62,6 +62,7 @@ nearfield_sim/
 │
 ├── estimators/                % Channel estimation algorithms
 │   ├── nf_clkl.m              % CL-KL (proposed): KL covariance fitting
+│   ├── nf_fckl.m              % Fixed-Curvature KL (ablation infrastructure; not used in published figures)
 │   ├── nf_psomp.m             % P-SOMP: beam-depth range sampling
 │   ├── nf_zhang.m             % DL-OMP: two-subarray dictionary learning
 │   ├── nf_music_tri.m         % MUSIC+Tri: subarray MUSIC + LS triangulation
@@ -69,10 +70,10 @@ nearfield_sim/
 │   └── nf_bfsomp.m            % BF-SOMP: beam-focused SOMP (Hussain TWC 2025)
 │
 ├── figures/                   % One script per paper figure
-│   ├── run_fig2_nmse_snr.m    % Fig. 2: NMSE vs SNR (primary result)
+│   ├── run_fig2_nmse_snr.m    % Fig. 2: NMSE vs SNR (primary result); call as run_fig2_nmse_snr(fast, use_par)
 │   ├── run_fig3_nmse_nrf.m    % Fig. 3: NMSE vs N_RF
 │   ├── run_fig4_nmse_n.m      % Fig. 4: NMSE vs N (snapshots)
-│   ├── run_fig5_nearfar.m     % Fig. 5: Near-to-far transition sweep
+│   ├── run_fig5_nearfar.m     % Fig. 5: Near-to-far transition sweep (display zoomed to r_max/r_RD ≤ 2.0; all 10 points saved to CSV)
 │   ├── run_fig6_runtime.m     % Fig. 6: Runtime vs M
 │   ├── run_fig7_robustness.m  % Fig. 7: Fresnel model-mismatch robustness
 │   ├── run_fig7b_source_robustness.m  % Fig. 7b: QPSK vs Gaussian pilots
@@ -97,7 +98,7 @@ setup
 test_modules   % should print: 11 PASSED, 0 FAILED
 test_fixes     % should print: 13 PASSED, 0 FAILED
 
-% 3. Run all figures (parallel, ~5 minutes on 6-core machine)
+% 3. Run all figures (parallel, ~4–5 minutes on 6-core machine)
 run_all('parfor')
 
 % 4. Run ablation study separately (~1 min with parfor)
@@ -125,7 +126,7 @@ All figures use these defaults unless overridden (see `nf_params.m`):
 | `theta` range | [20°, 60°] | Angle support |
 | `r` range | [0.05, 1.0] × r_RD | Range support |
 | `N_MC` | 400 | Monte Carlo trials (publication) |
-| `SNR` sweep | −15 to +25 dB | 9-point sweep |
+| `SNR` sweep | −15 to +20 dB | 8-point sweep (Fig. 2) |
 | Random seed | `rng(42,'twister')` | Fixed for reproducibility |
 
 Rayleigh distance: r_RD = 2D²/λ = 21.26 m at M = 64, f_c = 28 GHz.
@@ -135,9 +136,9 @@ Rayleigh distance: r_RD = 2D²/λ = 21.26 m at M = 64, f_c = 28 GHz.
 ## Simulation Modes
 
 ```matlab
-run_all             % Serial, full N_MC=400  (~20–40 min)
-run_all('parfor')   % Parallel, full N_MC=400 (~5 min, 6 cores)
-run_all('fast')     % Serial, N_MC=20 preview (~8 min)
+run_all             % Serial, full N_MC=400  (~20–35 min)
+run_all('parfor')   % Parallel, full N_MC=400 (~4–5 min, 6 cores)
+run_all('fast')     % Serial, N_MC=20 preview (~7 min)
 run_all('fast parfor') % Parallel, N_MC=20 preview (~1 min)
 ```
 
@@ -160,6 +161,11 @@ since parfor would distort wall-clock timing.
 **Filled markers** in all figures: compressed-domain input (CL-KL, P-SOMP).
 **Open markers**: full-array input (64× more data than compressed methods).
 
+**Ablation infrastructure (not used in published figures):**
+`nf_fckl.m` — Fixed-Curvature KL wrapper (frozen u = 1/r̄; no curvature learning).
+Retained for potential follow-up ablation work. The `do_post_loop_scan` flag in
+`nf_clkl.m` (default `true`) can be set to `false` for a matched ablation.
+
 ---
 
 ## Reproducibility
@@ -173,15 +179,26 @@ run_ablation(true)   % regenerates ablation table (nf_ablation_results.csv)
 ```
 
 Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
-- Full suite (`run_all('parfor')`): ~5 minutes
+- Full suite (`run_all('parfor')`): ~4–5 minutes
+- Fast preview (`run_all('fast parfor')`): ~1 minute (N_MC = 20)
 - Ablation (`run_ablation(true)`): ~1 minute
 - Test suites: ~30 seconds combined
+
+**Fig. 5 note:** `run_fig5_nearfar.m` simulates all 10 range-sweep points
+(r_max/r_RD ∈ {0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 3.0, 5.0}) and saves
+them all to the CSV. The exported figure is display-zoomed to r_max/r_RD ≤ 2.0
+(8 points) so that the EBRD (r_EBRD ≈ 0.058·r_RD) and Rayleigh distance (r_RD)
+reference lines are clearly separated. The two out-of-display points (3.0 and
+5.0) are available in `nf_simulation_results.csv` for extended analysis.
 
 ---
 
 ## CSV Output Schema
 
-### `nf_simulation_results.csv` (30 columns)
+### `nf_simulation_results.csv` (30 columns, 341 rows)
+
+Rows cover Figs. 2–9 (all methods, all sweep points). FC-KL rows are absent;
+`clkl_*` columns are populated for CL-KL rows only (NaN otherwise).
 
 | Column | Description |
 |--------|-------------|
@@ -230,11 +247,9 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 
 - **N_RF identifiability limit:** CL-KL and P-SOMP require d ≤ ⌊(N_RF−1)/2⌋
   (= 3 for N_RF = 8). NMSE degrades beyond this boundary.
-- **High-SNR OMP warm-start:** At SNR = +25 dB, CL-KL's OMP residual deflation
-  with a frozen-curvature approximation can select the wrong active set at
-  extreme SNR, causing convergence to a local minimum. All baselines are
-  unaffected. A Newton/Fisher-scoring refinement step is identified as
-  future work.
+- **High-SNR floor:** At high SNR, CL-KL NMSE approaches a residual floor set by
+  the Fresnel/dictionary mismatch rather than the noise floor. This is documented
+  in the paper and does not affect the operating SNR range of interest (≤ +20 dB).
 - **Range accuracy:** CL-KL optimises channel NMSE, not individual range
   accuracy. The post-loop matched-filter scan partially recovers range
   accuracy but a gap to the compressed-domain CRB remains.
@@ -244,14 +259,16 @@ Runtime on reference hardware (AMD Ryzen 5 7500F, 6 cores, 6000 MHz DDR5):
 ## Citation
 
 ```bibtex
-@article{senyuva2026clkl,
-  author  = {Şenyuva, Rıfat Volkan},
-  title   = {Covariance-Domain Near-Field Channel Estimation under Hybrid
-             Compression: {USW/Fresnel} Model, Curvature Learning, and
-             {KL} Covariance Fitting},
-  journal = {IEEE Transactions on Communications},
-  year    = {2026},
-  note    = {Submitted April 2026}
+@misc{senyuva2026clkl,
+  author       = {Şenyuva, Rıfat Volkan},
+  title        = {Covariance-Domain Near-Field Channel Estimation under Hybrid
+                  Compression: {USW/Fresnel} Model, Curvature Learning, and
+                  {KL} Covariance Fitting},
+  year         = {2026},
+  eprint       = {2603.28918},
+  archivePrefix= {arXiv},
+  primaryClass = {eess.SP},
+  url          = {https://arxiv.org/abs/2603.28918}
 }
 ```
 

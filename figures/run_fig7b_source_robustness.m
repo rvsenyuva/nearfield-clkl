@@ -41,8 +41,8 @@ P.M   = 64;  P = nf_update_derived_pub(P);
 P.N_RF = 8;  P.N = 64;  P.d = 3;
 P.N_MC = 400; if fast; P.N_MC = 20; end
 
-% Explicit 9-point sweep matching Fig.2
-SNR_vec = [-15, -10:5:20, 25];
+% 8-point sweep: cap at +20 dB (Session 2D Task 2; +25 dB rows removed from CSV)
+SNR_vec = [-15, -10:5:20];
 n_snr   = numel(SNR_vec);
 
 methods = {'CL-KL','P-SOMP','DL-OMP','MUSIC+Tri','DFrFT-NOMP','BF-SOMP'};

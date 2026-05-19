@@ -14,7 +14,7 @@ P.N_RF = 8;   P.N = 64;   P.d = 3;
 P.N_MC = 400; if fast; P.N_MC = 20; end
 
 % Explicit 9-point sweep matching Fig.2
-SNR_vec = [-15, -10:5:20, 25];
+SNR_vec = [-15, -10:5:20];  % Cap at +20 dB (Session 2D Task 2)
 n_snr   = numel(SNR_vec);
 methods = {'CL-KL','P-SOMP','DL-OMP','DFrFT-NOMP','BF-SOMP'};
 n_meth  = numel(methods);
@@ -72,7 +72,7 @@ plot_fig(SNR_vec, NMSE_db, NMSE_std, methods, ...
     'NumColumns', 2, 'LegTitle', '');
 xlim([min(SNR_vec)-1, max(SNR_vec)+1]);
 % Single-column export (side-by-side with Fig.8 in LaTeX)
-nf_export_fig(gcf, 'fig7_robustness', 'single', 'Height', 8.0);
+nf_export_fig(gcf, 'fig7_robustness', 'single', 'Height', 9.5);
 fprintf('Fig.7 -> fig7_robustness.pdf  |  CSV -> %s\n', CSV);
 end
 

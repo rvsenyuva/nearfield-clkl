@@ -1,4 +1,4 @@
-cff-version: 1.1.0
+cff-version: 1.2.0
 message: "If you use this code, please cite the paper and the software as below."
 title: "Covariance-Domain Near-Field Channel Estimation under Hybrid Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting — Simulation Code"
 authors:
@@ -6,8 +6,8 @@ authors:
     given-names: "Rıfat Volkan"
     orcid: "https://orcid.org/0000-0003-2928-0627"
     affiliation: "Department of Electrical-Electronics Engineering, Maltepe University, Istanbul, Turkey"
-version: "1.2"
-date-released: "2026-04-26"
+version: "1.3"
+date-released: "2026-05-19"
 license: MIT
 repository-code: "https://github.com/rvsenyuva/nearfield-clkl"
 doi: "10.5281/zenodo.19322532"
@@ -24,6 +24,9 @@ preferred-citation:
       given-names: "Rıfat Volkan"
       orcid: "https://orcid.org/0000-0003-2928-0627"
   title: "Covariance-Domain Near-Field Channel Estimation under Hybrid Compression: USW/Fresnel Model, Curvature Learning, and KL Covariance Fitting"
-  journal: "IEEE Transactions on Communications"
   year: 2026
-  notes: "Submitted April 2026"
+  url: "https://arxiv.org/abs/2603.28918"
+  identifiers:
+    - type: other
+      value: "arXiv:2603.28918 [eess.SP]"
+      description: "arXiv preprint identifier"

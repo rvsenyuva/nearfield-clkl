@@ -20,6 +20,12 @@ function run_fig5_nearfar(fast, use_par)
 %       marks the onset of strong polar-domain sparsity.
 %     - r_RD = 1.0*r_RD marks the classical Rayleigh distance.
 %
+%  4. Plot x-axis zoomed to (0, 2.0] (8 of 10 simulated sweep points).
+%     The simulation loop and CSV output are UNCHANGED (all 10 points
+%     are still computed and saved).  The zoom is a display-only filter
+%     applied in the plot block so that the EBRD (0.058) and r_RD (1.0)
+%     markers are clearly separated in the figure.
+%
 %  Results written to nf_simulation_results.csv after each sweep point.
 if nargin < 1; fast = false; end
 if nargin < 2; use_par = false; end
@@ -98,21 +104,26 @@ end
 
 
 % ---- Plot -- unified legend below, no per-subplot legends ---------------
-fig5 = figure('Name','Fig5_NearFar','Position',[100 100 900 380]);
+% Restrict display to (0, 2.0] -- first 8 of 10 simulated sweep points.
+% Simulation data for points 3.0 and 5.0 are retained in the CSV;
+% the zoom is a display-only filter.
+plot_idx    = rmax_fac_vec <= 2.0;          % logical index into columns
+x_ax_plot   = rmax_fac_vec(plot_idx);       % 8-element vector
+
+fig5 = figure('Name','Fig5_NearFar','Position',[100 100 800 380]);
 styles={'-o','-s','--^',':d','-.h'};
 colors={[0 0.45 0.74],[0.85 0.33 0.10],[0.47 0.67 0.19],[0.49 0.18 0.56],[0.30 0.57 0.43]};
-x_ax = rmax_fac_vec;
 ebrd_fac = P.r_EBRD_fac;
 rrd_fac  = 1.0;
 
 subplot(1,3,1);
 for mi=1:n_meth
-    semilogy(x_ax,RMSE_r(mi,:),styles{mi},'Color',colors{mi},...
+    semilogy(x_ax_plot,RMSE_r(mi,plot_idx),styles{mi},'Color',colors{mi},...
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('RMSE(r) [m]','FontSize',11);
 % title() call removed (P6.1): LaTeX caption is canonical.
-grid on;
+grid on; xlim([0, 2.05]);
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,...
     'Label','r_{EBRD}','LabelVerticalAlignment','bottom',...
     'LabelHorizontalAlignment','right','HandleVisibility','off');
@@ -122,23 +133,23 @@ xline(rrd_fac,'--k','LineWidth',1.2,'Label','r_{RD}',...
 
 subplot(1,3,2);
 for mi=1:n_meth
-    plot(x_ax,RMSE_th(mi,:),styles{mi},'Color',colors{mi},...
+    plot(x_ax_plot,RMSE_th(mi,plot_idx),styles{mi},'Color',colors{mi},...
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('RMSE(\theta) [deg]','FontSize',11);
 % title() call removed (P6.1): LaTeX caption is canonical.
-grid on;
+grid on; xlim([0, 2.05]);
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,'HandleVisibility','off');
 xline(rrd_fac,'--k','LineWidth',1.2,'HandleVisibility','off');
 
 subplot(1,3,3);
 for mi=1:n_meth
-    plot(x_ax,NMSE_db(mi,:),styles{mi},'Color',colors{mi},...
+    plot(x_ax_plot,NMSE_db(mi,plot_idx),styles{mi},'Color',colors{mi},...
         'LineWidth',1.5,'MarkerSize',7,'DisplayName',methods{mi}); hold on;
 end
 xlabel('r_{max}/r_{RD}','FontSize',11); ylabel('NMSE (dB)','FontSize',11);
 % title() call removed (P6.1): LaTeX caption is canonical.
-grid on;
+grid on; xlim([0, 2.05]);
 xline(ebrd_fac,'--','Color',[0.6 0.2 0.8],'LineWidth',1.2,'Label','EBRD',...
     'LabelVerticalAlignment','top','LabelHorizontalAlignment','right',...
     'HandleVisibility','off');

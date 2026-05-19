@@ -1,4 +1,4 @@
-function [theta_hat, r_hat, p_hat, u_hat, info] = nf_clkl(R_hat, W, P)
+function [theta_hat, r_hat, p_hat, u_hat, info] = nf_clkl(R_hat, W, P, do_post_loop_scan)
 %NF_CLKL  Curvature-Learned KL Covariance Fitting estimator (proposed).
 %
 %  IMPROVEMENTS in v5 (from paper audits):
@@ -41,13 +41,20 @@ max_iter = P.max_iter;
 tol      = P.tol_clkl;
 alpha_p0 = P.alpha_p / N_RF;
 
+% ---- do_post_loop_scan flag -----------------------------------------------
+% When false, skips Phase 2 post-loop MF scan (used by nf_fckl.m wrapper).
+% Default true to preserve existing CL-KL behaviour.
+if nargin < 4 || isempty(do_post_loop_scan); do_post_loop_scan = true; end
+
 % ---- Ablation flags (all default false; do NOT set in production runs) ---
 % P.ablation_update_N0    -- re-estimate N0 every 10 iters (v1 collapse mode)
 % P.ablation_single_start -- skip starts 1-2, use only Start 3 (far-range)
-% P.ablation_skip_scan    -- skip Phase 2 post-loop MF scan
+% P.ablation_skip_scan    -- skip Phase 2 post-loop MF scan (legacy; prefer do_post_loop_scan=false)
 abl_N0     = isfield(P,'ablation_update_N0')    && P.ablation_update_N0;
 abl_single = isfield(P,'ablation_single_start') && P.ablation_single_start;
 abl_noscan = isfield(P,'ablation_skip_scan')    && P.ablation_skip_scan;
+% Combine: skip scan if either legacy ablation flag or new do_post_loop_scan=false
+abl_noscan = abl_noscan || ~do_post_loop_scan;
 
 D_ap  = (M-1)*d_ant;
 r_RD  = 2*D_ap^2/lambda;
